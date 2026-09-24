@@ -61,7 +61,7 @@ flowchart LR
 
 ---
 
-![3D contribution graph](./profile-3d-contrib/profile-chxnho.svg)
+![3D contribution graph](./profile-3d-contrib/profile-chxnho-rainbow.svg)
 
 <div align="center">
   <sub><i>Building indispensable solutions through data, graphs, and AI.</i></sub>
