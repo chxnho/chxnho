@@ -1,0 +1,50 @@
+name: GitHub-Profile-3D-Contrib
+
+on:
+  schedule: # Daily at 00:00 KST (15:00 UTC)
+    - cron: "0 15 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: profile-3d
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: generate-github-profile-3d-contrib
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/checkout@v5
+        with:
+          repository: yoshi389111/github-profile-3d-contrib
+          ref: 7d95e7d4cdc028dd1e1cbd957d65f35efb12ae39
+          path: .profile-renderer
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Use the current Korean calendar date
+        run: python3 scripts/configure_graph_dates.py
+      - name: Build renderer
+        run: |
+          npm ci --prefix .profile-renderer
+          npm run tsc --prefix .profile-renderer
+      - name: Generate contribution images
+        run: node .profile-renderer/dist0/src/index.js
+        env:
+          TZ: Asia/Seoul
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          USERNAME: ${{ github.repository_owner }}
+          SETTING_JSON: profile-3d-contrib/settings.json
+      - name: Commit & Push
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add profile-3d-contrib/*.svg
+          if git commit -m "chore: update 3D contribution graph"; then
+            git push
+          fi
